@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OF Drinks | منيو نادي الزمالك</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@300;400;600&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --parchment:#EFE3C8;
+    --ink:#2A1C12;
+    --coffee:#3E2A1C;
+    --brass:#A9824F;
+    --burgundy:#7C2E2A;
+    --text:#2A1C12;
+    --text-dim:#6B5842;
+    --surface:#F7EFDC;
+    --line: color-mix(in srgb, var(--brass) 55%, transparent);
+  }
+  html.dark{
+    --ink:#F0E3C6;
+    --text:#F0E3C6;
+    --text-dim:#C9AF87;
+    --surface:#2A1C12;
+    --parchment:#221609;
+    --coffee:#3E2A1C;
+    --line: color-mix(in srgb, var(--brass) 45%, transparent);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth; scroll-padding-top:150px;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{transition-duration:.001ms !important; animation-duration:.001ms !important;} }
+  body{
+    background:var(--parchment);
+    color:var(--text);
+    font-family:'Cairo',sans-serif;
+    min-height:100vh;
+    transition:background .3s ease, color .3s ease;
+    background-image:
+      radial-gradient(circle at 15% 8%, color-mix(in srgb, var(--brass) 8%, transparent), transparent 40%),
+      radial-gradient(circle at 85% 92%, color-mix(in srgb, var(--brass) 8%, transparent), transparent 40%);
+  }
+  a{color:inherit; text-decoration:none;}
+  button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+  ul{list-style:none;}
+  :focus-visible{outline:3px solid var(--burgundy); outline-offset:3px;}
+
+  .frame{
+    position:fixed; inset:10px; border:1px solid var(--line); pointer-events:none; z-index:5;
+  }
+  .frame::before{
+    content:''; position:absolute; inset:6px; border:1px solid var(--line);
+  }
+
+  .eyebrow{font-family:'Tajawal',sans-serif; font-size:.72rem; letter-spacing:.18em; color:var(--text-dim); text-transform:uppercase;}
+
+  /* ---------- Header ---------- */
+  header.site-header{
+    position:fixed; inset-inline:0; top:0; z-index:60; height:78px;
+    display:flex; align-items:center; justify-content:space-between; padding:0 26px;
+    background:color-mix(in srgb, var(--parchment) 90%, transparent);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .icon-btn{
+    width:40px; height:40px; border-radius:50%; border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; transition:background .2s ease;
+  }
+  .icon-btn:hover{background:color-mix(in srgb, var(--brass) 15%, transparent);}
+  .icon-btn svg{width:18px; height:18px; stroke:var(--text); fill:none; stroke-width:1.6;}
+  .seal{
+    width:52px; height:52px; border-radius:50%; border:1.5px solid var(--brass);
+    display:flex; align-items:center; justify-content:center; position:relative;
+  }
+  .seal::before{content:''; position:absolute; inset:4px; border:1px solid var(--line); border-radius:50%;}
+  .seal span{font-family:'Aref Ruqaa',serif; font-size:1.15rem; color:var(--brass);}
+
+  /* ---------- Drawer ---------- */
+  .drawer-overlay{position:fixed; inset:0; background:rgba(20,12,4,.55); z-index:80; opacity:0; pointer-events:none; transition:opacity .25s ease;}
+  .drawer-overlay.open{opacity:1; pointer-events:auto;}
+  .drawer{
+    position:fixed; top:0; bottom:0; right:0; width:min(320px,84vw); z-index:90;
+    background:var(--surface); border-left:1px solid var(--line);
+    transform:translateX(105%); transition:transform .3s ease;
+    padding:26px; display:flex; flex-direction:column; gap:24px; overflow-y:auto;
+  }
+  .drawer.open{transform:translateX(0);}
+  .drawer-top{display:flex; justify-content:space-between; align-items:center;}
+  .drawer h3{font-family:'Amiri',serif; font-size:1.4rem;}
+  .drawer-section h4{font-size:.8rem; color:var(--text-dim); margin-bottom:10px; font-family:'Tajawal',sans-serif;}
+  .drawer-links{display:flex; flex-direction:column; gap:2px;}
+  .drawer-links a{padding:9px 4px; font-size:.95rem; border-bottom:1px dotted var(--line); font-family:'Amiri',serif;}
+  .theme-row{display:flex; align-items:center; justify-content:space-between; padding:12px 4px; border:1px solid var(--line); border-radius:4px;}
+  .switch{width:42px; height:24px; border-radius:20px; background:var(--coffee); position:relative; flex-shrink:0;}
+  .switch::after{content:''; position:absolute; top:3px; right:3px; width:18px; height:18px; border-radius:50%; background:var(--brass); transition:transform .25s ease;}
+  html.dark .switch::after{transform:translateX(-18px);}
+  .call-row{display:flex; align-items:center; gap:10px; padding:12px 4px; border:1px solid var(--line); border-radius:4px; font-family:'Tajawal',sans-serif;}
+  .admin-link{font-family:'Tajawal',sans-serif; font-size:.78rem; color:var(--text-dim); text-align:center; margin-top:auto; border-top:1px solid var(--line); padding-top:16px;}
+
+  /* ---------- Hero ---------- */
+  .hero{position:relative; padding:150px 20px 70px; text-align:center;}
+  .ornament{width:120px; margin:0 auto 18px; opacity:.8;}
+  .hero h1{font-family:'Aref Ruqaa',serif; font-size:clamp(3rem,12vw,4.6rem); color:var(--ink); line-height:1;}
+  .hero .subtitle{
+    font-family:'Amiri',serif; font-style:italic; font-size:1.2rem; color:var(--brass);
+    margin-top:6px; letter-spacing:.05em;
+  }
+  .hero p{margin:22px auto 0; max-width:440px; color:var(--text-dim); font-size:.98rem; line-height:2;}
+  .hero-ctas{display:flex; gap:14px; justify-content:center; margin-top:30px; flex-wrap:wrap;}
+  .btn{
+    padding:13px 28px; font-weight:600; font-size:.92rem; font-family:'Tajawal',sans-serif;
+    display:inline-flex; align-items:center; gap:8px; border-radius:2px; transition:transform .2s ease;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn-primary{background:var(--coffee); color:var(--parchment); border:1px solid var(--coffee);}
+  html.dark .btn-primary{background:var(--brass); color:var(--ink); border-color:var(--brass);}
+  .btn-ghost{border:1px solid var(--brass); color:var(--text);}
+
+  .ornament-divider{width:100%; max-width:280px; margin:46px auto 0; display:block; opacity:.75;}
+
+  /* ---------- Quick nav ---------- */
+  .quicknav-wrap{position:sticky; top:78px; z-index:50; background:var(--parchment); padding:16px 0; border-bottom:1px solid var(--line);}
+  .quicknav{display:flex; gap:8px; overflow-x:auto; padding:0 20px; scrollbar-width:none; justify-content:flex-start;}
+  .quicknav::-webkit-scrollbar{display:none;}
+  .pill{
+    flex-shrink:0; padding:8px 18px; font-family:'Tajawal',sans-serif; font-size:.82rem; font-weight:500;
+    color:var(--text-dim); border:1px solid var(--line); border-radius:2px; transition:all .2s ease;
+  }
+  .pill.active, .pill:hover{color:var(--parchment); background:var(--coffee); border-color:var(--coffee);}
+
+  /* ---------- Menu ---------- */
+  main{max-width:760px; margin:0 auto; padding:60px 22px 40px;}
+  .category{padding:38px 0 6px; scroll-margin-top:170px;}
+  .cat-head{text-align:center; margin-bottom:8px;}
+  .cat-head h2{font-family:'Aref Ruqaa',serif; font-size:1.9rem; color:var(--ink);}
+  .cat-head .count{font-family:'Tajawal',sans-serif; font-size:.72rem; color:var(--text-dim); letter-spacing:.12em; text-transform:uppercase;}
+  .cat-flourish{display:block; width:90px; margin:14px auto 26px; opacity:.65;}
+
+  .rows{display:flex; flex-direction:column; gap:2px;}
+  .row{
+    position:relative; display:flex; align-items:center; gap:12px; padding:13px 6px;
+    border-bottom:1px solid transparent; transition:background .2s ease;
+  }
+  .row .price{align-self:flex-end; margin-bottom:2px;}
+  .leader{align-self:flex-end;}
+  .row:hover{background:color-mix(in srgb, var(--brass) 8%, transparent);}
+  .row-icon{
+    width:44px; height:44px; border-radius:50%; flex-shrink:0; border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; background:var(--surface);
+  }
+  .row-icon .item-icon{width:60%; height:60%;}
+  .row .name-wrap{display:flex; flex-direction:column; flex-shrink:0;}
+  .row .name{font-size:1.05rem; font-weight:600;}
+  .row .desc{font-family:'Tajawal',sans-serif; font-size:.78rem; color:var(--text-dim); margin-top:2px;}
+  .row .ing-line{font-family:'Tajawal',sans-serif; font-size:.7rem; color:var(--text-dim); opacity:.75; margin-top:3px; font-style:italic;}
+  .leader{flex:1; border-bottom:2px dotted var(--line); margin-bottom:6px; min-width:20px;}
+  .row .price{
+    font-family:'Tajawal',sans-serif; font-weight:700; font-size:.95rem; color:var(--burgundy); flex-shrink:0;
+  }
+  html.dark .row .price{color:var(--brass);}
+  .row-del{
+    width:22px; height:22px; border-radius:50%; border:1px solid var(--burgundy); color:var(--burgundy);
+    display:none; align-items:center; justify-content:center; font-size:.75rem; flex-shrink:0;
+  }
+  body.admin-on .row-del{display:flex;}
+
+  /* ---------- Floating buttons ---------- */
+  .fab-stack{position:fixed; bottom:22px; left:18px; z-index:55; display:flex; flex-direction:column; gap:12px;}
+  .fab{
+    width:54px; height:54px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    border:1.5px solid var(--brass); background:var(--surface); box-shadow:0 10px 22px -10px rgba(0,0,0,.35);
+    transition:transform .2s ease;
+  }
+  .fab:hover{transform:scale(1.07);}
+  .fab-add{display:none; background:var(--coffee);}
+  .fab-add svg{stroke:var(--parchment);}
+  body.admin-on .fab-add{display:flex;}
+  .fab svg{width:22px; height:22px; stroke:var(--brass); fill:none; stroke-width:1.8;}
+
+  /* ---------- Footer ---------- */
+  footer{padding:60px 20px 100px; text-align:center; border-top:1px solid var(--line); margin-top:20px;}
+  footer .seal{margin:0 auto 14px;}
+  footer p{color:var(--text-dim); font-size:.9rem; font-family:'Tajawal',sans-serif;}
+  footer .foot-links{margin-top:12px; font-family:'Amiri',serif; font-size:1rem;}
+  .admin-toggle{margin-top:30px; font-size:.72rem; color:var(--text-dim); opacity:.55; font-family:'Tajawal',sans-serif;}
+
+  /* ---------- Modals ---------- */
+  .modal-overlay{position:fixed; inset:0; background:rgba(20,12,4,.6); z-index:100; display:none; align-items:center; justify-content:center; padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--surface); border:1px solid var(--brass); padding:30px; width:100%; max-width:380px; position:relative;}
+  .modal h3{font-family:'Aref Ruqaa',serif; font-size:1.5rem; margin-bottom:6px;}
+  .modal .sub{font-family:'Tajawal',sans-serif; color:var(--text-dim); font-size:.85rem; margin-bottom:20px;}
+  .modal-close{position:absolute; top:16px; left:16px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-family:'Tajawal',sans-serif; font-size:.8rem; color:var(--text-dim); margin-bottom:6px;}
+  .field input, .field select, .field textarea{
+    width:100%; padding:11px 13px; border:1px solid var(--line); background:var(--parchment); color:var(--text);
+    font-family:'Cairo',sans-serif; font-size:.95rem; border-radius:2px;
+  }
+  .field textarea{resize:vertical; min-height:60px;}
+  .modal .btn{width:100%; justify-content:center; margin-top:6px;}
+  .error-msg{color:var(--burgundy); font-family:'Tajawal',sans-serif; font-size:.8rem; margin-top:8px; display:none;}
+  .error-msg.show{display:block;}
+  .toast{
+    position:fixed; bottom:26px; right:50%; transform:translateX(50%);
+    background:var(--coffee); color:var(--parchment); padding:11px 22px; border-radius:2px;
+    font-family:'Tajawal',sans-serif; font-weight:600; font-size:.85rem; z-index:120;
+    opacity:0; pointer-events:none; transition:opacity .3s ease, bottom .3s ease; border:1px solid var(--brass);
+  }
+  .toast.show{opacity:1; bottom:36px;}
+
+  @media(max-width:480px){
+    .row{flex-wrap:wrap;}
+    .leader{order:3; width:100%; flex-basis:100%; margin-top:2px;}
+  }
+</style>
+</head>
+<body>
+<div class="frame"></div>
+
+<header class="site-header">
+  <button class="icon-btn" id="menuBtn" aria-label="فتح القائمة">
+    <svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <div class="seal"><span>OF</span></div>
+  <a class="icon-btn" href="tel:01027332284" aria-label="اتصل للطلب">
+    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+  </a>
+</header>
+
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<nav class="drawer" id="drawer">
+  <div class="drawer-top">
+    <h3>القائمة والخيارات</h3>
+    <button class="icon-btn" id="drawerClose" aria-label="إغلاق">
+      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.6" fill="none"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-section">
+    <h4>تغيير المظهر</h4>
+    <button class="theme-row" id="themeToggle" style="width:100%">
+      <span style="font-family:'Tajawal',sans-serif; font-size:.88rem;">تبديل الوضع (فاتح / داكن)</span>
+      <span class="switch"></span>
+    </button>
+  </div>
+  <div class="drawer-section">
+    <h4>للطلب والاستعلام</h4>
+    <a class="call-row" href="tel:01027332284">
+      <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      01027332284
+    </a>
+  </div>
+  <div class="drawer-section">
+    <h4>الأقسام السريعة</h4>
+    <div class="drawer-links" id="drawerLinks"></div>
+  </div>
+  <a class="admin-link" href="#" id="adminOpenLink">لوحة تحكم المدير</a>
+</nav>
+
+<section class="hero">
+  <svg class="ornament" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg" stroke="var(--brass)" stroke-width="1.2" fill="none">
+    <path d="M0 20h34M86 20h34" stroke-linecap="round"/>
+    <path d="M60 8c-8 0-8 12-16 12s-8-12-16-12M60 8c8 0 8 12 16 12s8-12 16-12" stroke-linecap="round"/>
+    <circle cx="60" cy="20" r="4"/>
+  </svg>
+  <h1>OF</h1>
+  <div class="subtitle">DRINKS · نادي الزمالك</div>
+  <p>أرقى العصائر الطبيعية، الميكسات، والمشروبات الساخنة والباردة — تقدَّم بعناية على الطريقة الكلاسيكية.</p>
+  <div class="hero-ctas">
+    <a class="btn btn-primary" href="tel:01027332284">اطلب دلوقتي</a>
+    <a class="btn btn-ghost" href="#menu">شاهد المنيو</a>
+  </div>
+  <svg class="ornament-divider" viewBox="0 0 280 24" xmlns="http://www.w3.org/2000/svg" stroke="var(--brass)" stroke-width="1" fill="none">
+    <path d="M0 12h110M170 12h110" stroke-linecap="round"/>
+    <path d="M140 4c-10 0-10 16-20 16M140 4c10 0 10 16 20 16" stroke-linecap="round"/>
+    <circle cx="140" cy="12" r="3.5"/>
+  </svg>
+</section>
+
+<div class="quicknav-wrap">
+  <div class="quicknav" id="quicknav"></div>
+</div>
+
+<main id="menu"></main>
+
+<footer>
+  <div class="seal" style="margin:0 auto 14px;"><span>OF</span></div>
+  <p>نادي الزمالك — القاهرة</p>
+  <div class="foot-links"><a href="tel:01027332284">01027332284</a></div>
+  <div class="admin-toggle"><a href="#" id="adminOpenLink2">لوحة تحكم المدير</a></div>
+</footer>
+
+<div class="fab-stack">
+  <button class="fab fab-add" id="fabAdd" aria-label="إضافة عنصر">
+    <svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M12 5v14M5 12h14"/></svg>
+  </button>
+  <a class="fab fab-call" href="tel:01027332284" aria-label="اتصل الآن">
+    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+  </a>
+</div>
+
+<div class="modal-overlay" id="adminModal">
+  <div class="modal">
+    <button class="icon-btn modal-close" id="adminClose" aria-label="إغلاق"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.6" fill="none"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <h3>تفعيل وضع التعديل</h3>
+    <p class="sub">أدخل كلمة السر الخاصة بالمدير لتعديل القائمة</p>
+    <div class="field"><label for="adminPass">كلمة السر</label><input type="password" id="adminPass" autocomplete="off"></div>
+    <p class="error-msg" id="adminError">كلمة السر خاطئة!</p>
+    <button class="btn btn-primary" id="adminSubmit">دخول</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <button class="icon-btn modal-close" id="addClose" aria-label="إغلاق"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.6" fill="none"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <h3>إضافة عنصر</h3>
+    <p class="sub">هيتضاف للمنيو فورًا</p>
+    <div class="field"><label for="itemCat">القسم</label><select id="itemCat"></select></div>
+    <div class="field"><label for="itemName">اسم المشروب / الصنف</label><input type="text" id="itemName"></div>
+    <div class="field"><label for="itemDesc">وصف مختصر (اختياري)</label><textarea id="itemDesc"></textarea></div>
+    <div class="field"><label for="itemIng">المكونات (افصل بفاصلة ،)</label><input type="text" id="itemIng" placeholder="مثال: مانجو، ثلج، سكر"></div>
+    <div class="field"><label for="itemPrice">السعر (جنيه)</label><input type="number" id="itemPrice" min="0"></div>
+    <button class="btn btn-primary" id="addSubmit">حفظ التغييرات</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ADMIN_PASSWORD = "of2024";
+const CAT_ICONS = {
+  juices:"glass", mixes:"cocktail", smoothies:"smoothie", milkshakes:"shake",
+  hotcoffee:"mug", icedcoffee:"iced", tea:"teacup", mojito:"mojito",
+  sodafrappe:"frappe", bites:"plate"
+};
+const ITEM_ICONS = {
+  glass:`<path d="M20 14h24l-3 30a9 9 0 0 1-9 8h0a9 9 0 0 1-9-8L20 14Z"/><path d="M20 14h24" stroke-linecap="round"/><circle cx="32" cy="24" r="4"/><path d="M32 24V8" stroke-linecap="round"/>`,
+  cocktail:`<path d="M14 14h36L32 34 14 14Z"/><path d="M32 34v18M22 52h20" stroke-linecap="round"/><path d="M26 22l4 5 4-5" stroke-linecap="round"/>`,
+  smoothie:`<path d="M22 12h20l-2 40a4 4 0 0 1-4 4H28a4 4 0 0 1-4-4L22 12Z"/><path d="M22 12h20M40 8v10" stroke-linecap="round"/><path d="M27 22c2 4 8 4 10 0" stroke-linecap="round"/>`,
+  shake:`<path d="M20 10h24l-3 4-2 38a4 4 0 0 1-4 4H29a4 4 0 0 1-4-4l-2-38-3-4Z"/><path d="M44 10c3-6-6-8-6-2" stroke-linecap="round"/><circle cx="38" cy="6" r="2.4"/>`,
+  mug:`<path d="M14 18h26v20a10 10 0 0 1-10 10h-6a10 10 0 0 1-10-10V18Z"/><path d="M40 22h6a6 6 0 0 1 0 12h-6"/><path d="M20 10c1 3-2 3-1 6M28 10c1 3-2 3-1 6" stroke-linecap="round"/>`,
+  iced:`<path d="M20 12h24l-3 38a4 4 0 0 1-4 4H27a4 4 0 0 1-4-4L20 12Z"/><path d="M20 12h24M26 12v10M38 12v10" stroke-linecap="round"/><path d="M24 30h16" stroke-dasharray="2 4" stroke-linecap="round"/>`,
+  teacup:`<path d="M12 22h28v14a10 10 0 0 1-10 10h-8a10 10 0 0 1-10-10V22Z"/><path d="M40 26h5a5 5 0 0 1 0 10h-5"/><path d="M18 14c1 3-2 3-1 6M26 14c1 3-2 3-1 6M34 14c1 3-2 3-1 6" stroke-linecap="round"/>`,
+  mojito:`<path d="M22 10h20l-2 42a4 4 0 0 1-4 4H28a4 4 0 0 1-4-4L22 10Z"/><path d="M22 10h20" stroke-linecap="round"/><path d="M27 18c3 2 3 6 0 8M35 16c-3 2-3 8 0 10" stroke-linecap="round"/><path d="M40 8l6-6" stroke-linecap="round"/>`,
+  frappe:`<path d="M20 16h24l-3 34a4 4 0 0 1-4 4H27a4 4 0 0 1-4-4L20 16Z"/><path d="M17 16h30" stroke-linecap="round"/><path d="M26 6c8 0 8 6 12 6" stroke-linecap="round"/><path d="M36 6v6" stroke-linecap="round"/>`,
+  plate:`<circle cx="32" cy="34" r="20"/><circle cx="32" cy="34" r="13"/><path d="M24 30c2-6 12-6 14 0" stroke-linecap="round"/>`
+};
+function itemIconSVG(catId){
+  const key = CAT_ICONS[catId] || "glass";
+  return `<svg class="item-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="var(--brass)" stroke-width="2.6" stroke-linejoin="round">${ITEM_ICONS[key]}</svg>`;
+}
+
+const DEFAULT_MENU = [
+  {id:"juices", name:"عصائر طبيعية", items:[
+    {name:"مانجو", desc:"مانجو طازة 100%", ing:["مانجو بلدي","ثلج"], price:55},
+    {name:"فراولة", desc:"فراولة مثلجة فريش", ing:["فراولة","سكر","ثلج"], price:50},
+    {name:"مانجو فراولة", desc:"ميكس مانجو وفراولة", ing:["مانجو","فراولة"], price:60},
+    {name:"جوافة", desc:"جوافة بلدي طازة", ing:["جوافة","سكر"], price:45},
+    {name:"برتقال", desc:"عصير برتقال طبيعي", ing:["برتقال طازة"], price:40},
+    {name:"ليمون بالنعناع", desc:"ليمون فريش ونعناع", ing:["ليمون","نعناع","سكر"], price:35},
+  ]},
+  {id:"mixes", name:"ميكسات وموكتيل", items:[
+    {name:"بينك بارادايز", desc:"فراولة، جوافة، كريز", ing:["فراولة","جوافة","شراب كريز"], price:65},
+    {name:"تروبيكال ميكس", desc:"مانجو، أناناس، باشون فروت", ing:["مانجو","أناناس","باشون فروت"], price:70},
+    {name:"جوافة فراولة", desc:"جوافة، فراولة، ليمون", ing:["جوافة","فراولة","ليمون"], price:60},
+    {name:"مانجو باشون", desc:"مانجو وباشون فروت", ing:["مانجو","باشون فروت"], price:65},
+  ]},
+  {id:"smoothies", name:"سموزي", items:[
+    {name:"فراولة موز", desc:"فراولة، موز، حليب", ing:["فراولة","موز","حليب"], price:60},
+    {name:"مانجو أناناس", desc:"مانجو، أناناس، زبادي", ing:["مانجو","أناناس","زبادي"], price:65},
+    {name:"بيري ميكس", desc:"توت مشكل وزبادي", ing:["توت مشكل","زبادي","عسل"], price:70},
+  ]},
+  {id:"milkshakes", name:"ميلك شيك", items:[
+    {name:"شوكولاتة", desc:"شوكولاتة بلجيكي", ing:["آيس كريم فانيليا","شوكولاتة","حليب"], price:65},
+    {name:"فانيليا", desc:"فانيليا كريمي", ing:["آيس كريم فانيليا","حليب","كريمة"], price:60},
+    {name:"فراولة", desc:"فراولة طازة وكريمة", ing:["آيس كريم فراولة","فراولة طازة","كريمة"], price:65},
+    {name:"أوريو", desc:"أوريو وكريمة", ing:["آيس كريم فانيليا","بسكويت أوريو","كريمة"], price:70},
+    {name:"بيتزل", desc:"بيتزل وكراميل", ing:["آيس كريم فانيليا","بيتزل","كراميل"], price:75},
+  ]},
+  {id:"hotcoffee", name:"قهوة ساخنة", items:[
+    {name:"اسبريسو", desc:"شوت اسبريسو مركز", ing:["بن مطحون"], price:35},
+    {name:"كابتشينو", desc:"اسبريسو ورغوة حليب", ing:["اسبريسو","حليب مبخر"], price:45},
+    {name:"لاتيه", desc:"اسبريسو وحليب كريمي", ing:["اسبريسو","حليب"], price:48},
+    {name:"موكا", desc:"اسبريسو، شوكولاتة، حليب", ing:["اسبريسو","شوكولاتة","حليب"], price:52},
+    {name:"قهوة تركي", desc:"تحضير تقليدي", ing:["بن تركي","سكر"], price:30},
+  ]},
+  {id:"icedcoffee", name:"قهوة مثلجة", items:[
+    {name:"آيس لاتيه", desc:"اسبريسو وحليب مثلج", ing:["اسبريسو","حليب","ثلج"], price:50},
+    {name:"آيس أمريكانو", desc:"اسبريسو وماء مثلج", ing:["اسبريسو","ماء","ثلج"], price:42},
+    {name:"آيس موكا", desc:"اسبريسو، شوكولاتة، ثلج", ing:["اسبريسو","شوكولاتة","حليب","ثلج"], price:55},
+    {name:"سبانيش لاتيه", desc:"حليب مكثف محلى", ing:["اسبريسو","حليب مكثف","ثلج"], price:58},
+  ]},
+  {id:"tea", name:"شاي وأعشاب", items:[
+    {name:"شاي أحمر", desc:"شاي كشري بلدي", ing:["شاي","سكر"], price:20},
+    {name:"ينسون", desc:"ينسون ساخن", ing:["ينسون"], price:22},
+    {name:"حلبة", desc:"حلبة بالحليب أو سادة", ing:["حلبة","حليب اختياري"], price:25},
+    {name:"كركديه", desc:"سخن أو مثلج", ing:["كركديه","سكر"], price:25},
+    {name:"زنجبيل وليمون", desc:"مشروب دافئ منعش", ing:["زنجبيل","ليمون","عسل"], price:28},
+  ]},
+  {id:"mojito", name:"موهيتو", items:[
+    {name:"موهيتو كلاسيك", desc:"ليمون ونعناع", ing:["ليمون","نعناع","صودا"], price:45},
+    {name:"بلوبيري موهيتو", desc:"توت أزرق ونعناع", ing:["توت أزرق","نعناع","ليمون","صودا"], price:55},
+    {name:"توت موهيتو", desc:"فراولة وتوت ونعناع", ing:["فراولة","توت","نعناع","صودا"], price:55},
+    {name:"مانجو موهيتو", desc:"مانجو ونعناع", ing:["مانجو","نعناع","صودا"], price:55},
+  ]},
+  {id:"sodafrappe", name:"غازيات وفرابيه", items:[
+    {name:"فرابيه كراميل", desc:"قهوة مثلجة مخفوقة", ing:["اسبريسو","حليب","كراميل","ثلج"], price:55},
+    {name:"فرابيه شوكولاتة", desc:"شوكولاتة مخفوقة", ing:["اسبريسو","شوكولاتة","حليب","ثلج"], price:55},
+    {name:"ريدبول ميكس", desc:"ريدبول مع فواكه", ing:["ريدبول","فواكه مشكلة","ثلج"], price:60},
+    {name:"آيس كريم فلوت", desc:"مشروب غازي وآيس كريم", ing:["مشروب غازي","آيس كريم فانيليا"], price:50},
+  ]},
+  {id:"bites", name:"سناكس خفيفة", items:[
+    {name:"كرواسون", desc:"زبدة أو شوكولاتة", ing:["عجينة كرواسون","زبدة أو شوكولاتة"], price:35},
+    {name:"وافل", desc:"وافل بالعسل الأسود أو نوتيلا", ing:["عجينة وافل","عسل أسود أو نوتيلا"], price:60},
+    {name:"كوكيز", desc:"كوكيز شوكولاتة طازة", ing:["دقيق","شوكولاتة","زبدة"], price:25},
+    {name:"كيك الشوكولاتة", desc:"قطعة كيك دافئة", ing:["كيك شوكولاتة","صوص شوكولاتة"], price:45},
+  ]},
+];
+
+let menuData = loadMenu();
+
+function loadMenu(){
+  try{ const saved = localStorage.getItem('of-menu-data-classic'); if(saved) return JSON.parse(saved); }catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT_MENU));
+}
+function saveMenu(){ try{ localStorage.setItem('of-menu-data-classic', JSON.stringify(menuData)); }catch(e){} }
+
+function flourishSVG(){
+  return `<svg class="cat-flourish" viewBox="0 0 90 16" xmlns="http://www.w3.org/2000/svg" stroke="var(--brass)" stroke-width="1" fill="none">
+    <path d="M0 8h30M60 8h30" stroke-linecap="round"/>
+    <path d="M45 2c-6 0-6 10-12 10M45 2c6 0 6 10 12 10" stroke-linecap="round"/>
+  </svg>`;
+}
+
+function render(){
+  const main = document.getElementById('menu');
+  const quicknav = document.getElementById('quicknav');
+  const drawerLinks = document.getElementById('drawerLinks');
+  const itemCatSelect = document.getElementById('itemCat');
+  main.innerHTML=''; quicknav.innerHTML=''; drawerLinks.innerHTML=''; itemCatSelect.innerHTML='';
+
+  menuData.forEach((cat, ci) => {
+    quicknav.insertAdjacentHTML('beforeend', `<a class="pill" href="#${cat.id}">${cat.name}</a>`);
+    drawerLinks.insertAdjacentHTML('beforeend', `<a href="#${cat.id}">${cat.name}</a>`);
+    itemCatSelect.insertAdjacentHTML('beforeend', `<option value="${cat.id}">${cat.name}</option>`);
+
+    const section = document.createElement('section');
+    section.className = 'category';
+    section.id = cat.id;
+    section.innerHTML = `
+      <div class="cat-head">
+        <div class="count">${cat.items.length} أصناف</div>
+        <h2>${cat.name}</h2>
+      </div>
+      ${flourishSVG()}
+      <div class="rows">
+        ${cat.items.map((item, ii) => `
+          <div class="row">
+            <button class="row-del" data-cat="${ci}" data-item="${ii}" aria-label="حذف">×</button>
+            <div class="row-icon">${itemIconSVG(cat.id)}</div>
+            <div class="name-wrap">
+              <span class="name">${item.name}</span>
+              ${item.desc ? `<span class="desc">${item.desc}</span>` : ''}
+              ${item.ing && item.ing.length ? `<span class="ing-line">${item.ing.join(' · ')}</span>` : ''}
+            </div>
+            <span class="leader"></span>
+            <span class="price">${item.price} ج.م</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    main.appendChild(section);
+  });
+
+  document.querySelectorAll('.row-del').forEach(btn=>{
+    btn.addEventListener('click', () => {
+      const c = +btn.dataset.cat, i = +btn.dataset.item;
+      menuData[c].items.splice(i,1);
+      saveMenu(); render(); showToast('تم الحذف');
+    });
+  });
+
+  setupScrollSpy();
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+function setupScrollSpy(){
+  const pills = document.querySelectorAll('.pill');
+  const sections = document.querySelectorAll('.category');
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        pills.forEach(p=>p.classList.remove('active'));
+        const active = document.querySelector(`.pill[href="#${e.target.id}"]`);
+        if(active) active.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -50% 0px'});
+  sections.forEach(s=>obs.observe(s));
+}
+
+function initTheme(){
+  const saved = localStorage.getItem('of-theme-classic');
+  if(saved === 'dark') document.documentElement.classList.add('dark');
+}
+document.getElementById('themeToggle').addEventListener('click', ()=>{
+  document.documentElement.classList.toggle('dark');
+  localStorage.setItem('of-theme-classic', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+});
+
+const drawer = document.getElementById('drawer');
+const drawerOverlay = document.getElementById('drawerOverlay');
+function openDrawer(){ drawer.classList.add('open'); drawerOverlay.classList.add('open'); }
+function closeDrawer(){ drawer.classList.remove('open'); drawerOverlay.classList.remove('open'); }
+document.getElementById('menuBtn').addEventListener('click', openDrawer);
+document.getElementById('drawerClose').addEventListener('click', closeDrawer);
+drawerOverlay.addEventListener('click', closeDrawer);
+document.querySelectorAll('.drawer-links, .drawer').forEach(el=>{
+  el.addEventListener('click', (e)=>{ if(e.target.tagName === 'A' && e.target.getAttribute('href').startsWith('#')) closeDrawer(); });
+});
+
+const adminModal = document.getElementById('adminModal');
+const addModal = document.getElementById('addModal');
+let isAdmin = false;
+function openAdminModal(){ adminModal.classList.add('open'); document.getElementById('adminPass').focus(); closeDrawer(); }
+function closeAdminModal(){ adminModal.classList.remove('open'); document.getElementById('adminError').classList.remove('show'); document.getElementById('adminPass').value=''; }
+document.getElementById('adminOpenLink').addEventListener('click', e=>{e.preventDefault(); openAdminModal();});
+document.getElementById('adminOpenLink2').addEventListener('click', e=>{e.preventDefault(); openAdminModal();});
+document.getElementById('adminClose').addEventListener('click', closeAdminModal);
+adminModal.addEventListener('click', e=>{ if(e.target === adminModal) closeAdminModal(); });
+
+document.getElementById('adminSubmit').addEventListener('click', ()=>{
+  const val = document.getElementById('adminPass').value;
+  if(val === ADMIN_PASSWORD){
+    isAdmin = true;
+    document.body.classList.add('admin-on');
+    closeAdminModal();
+    showToast('تم تفعيل وضع التعديل');
+  } else {
+    document.getElementById('adminError').classList.add('show');
+  }
+});
+document.getElementById('adminPass').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('adminSubmit').click(); });
+
+function openAddModal(){ addModal.classList.add('open'); document.getElementById('itemName').focus(); }
+function closeAddModal(){
+  addModal.classList.remove('open');
+  document.getElementById('itemName').value=''; document.getElementById('itemDesc').value='';
+  document.getElementById('itemIng').value=''; document.getElementById('itemPrice').value='';
+}
+document.getElementById('fabAdd').addEventListener('click', openAddModal);
+document.getElementById('addClose').addEventListener('click', closeAddModal);
+addModal.addEventListener('click', e=>{ if(e.target === addModal) closeAddModal(); });
+
+document.getElementById('addSubmit').addEventListener('click', ()=>{
+  const catId = document.getElementById('itemCat').value;
+  const name = document.getElementById('itemName').value.trim();
+  const desc = document.getElementById('itemDesc').value.trim();
+  const ingRaw = document.getElementById('itemIng').value.trim();
+  const ing = ingRaw ? ingRaw.split(/[،,]/).map(s=>s.trim()).filter(Boolean) : [];
+  const price = document.getElementById('itemPrice').value;
+  if(!name || !price) return;
+  const cat = menuData.find(c => c.id === catId);
+  cat.items.push({name, desc, ing, price:Number(price)});
+  saveMenu(); render(); closeAddModal(); showToast('تمت الإضافة بنجاح');
+});
+
+document.addEventListener('keydown', e=>{
+  if(e.key === 'Escape'){ closeDrawer(); closeAdminModal(); closeAddModal(); }
+});
+
+initTheme();
+render();
+</script>
+</body>
+</html>
