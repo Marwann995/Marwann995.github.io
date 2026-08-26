@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MōKka Admin</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            background: #f3ece3;
+        }
+
+        .admin-header {
+            background: #2e190d;
+            color: #f8f2e9;
+            padding: 22px;
+        }
+
+        .admin-header-inner {
+            max-width: 1100px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .admin-header img {
+            width: 110px;
+        }
+
+        .admin-header h1 {
+            font-size: 20px;
+        }
+
+        .admin-container {
+            width: min(1100px, calc(100% - 28px));
+            margin: 35px auto;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat {
+            background: white;
+            padding: 22px;
+            border-radius: 20px;
+        }
+
+        .stat-number {
+            font-size: 30px;
+            font-weight: 800;
+            color: #4b2d19;
+        }
+
+        .stat-label {
+            color: #927c68;
+            font-size: 12px;
+        }
+
+        .admin-card {
+            background: white;
+            border-radius: 20px;
+            padding: 22px;
+            margin-bottom: 25px;
+        }
+
+        .admin-card h2 {
+            font-size: 18px;
+            color: #3b2415;
+            margin-bottom: 6px;
+        }
+
+        .admin-card p {
+            font-size: 12px;
+            color: #8c7865;
+            margin-bottom: 16px;
+        }
+
+        .admin-toolbar {
+            background: white;
+            border-radius: 20px;
+            padding: 18px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .admin-search {
+            flex: 1;
+            min-width: 200px;
+            border: 1px solid #ddd0c0;
+            padding: 13px 15px;
+            border-radius: 12px;
+            outline: none;
+        }
+
+        .admin-button {
+            border: none;
+            border-radius: 12px;
+            padding: 12px 18px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .admin-button.primary {
+            background: #3b2415;
+            color: white;
+        }
+
+        .admin-button.secondary {
+            background: #eadcca;
+            color: #3b2415;
+        }
+
+        .admin-products {
+            display: grid;
+            gap: 10px;
+        }
+
+        .admin-product {
+            background: white;
+            border-radius: 17px;
+            padding: 17px;
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .admin-product-name {
+            font-weight: 800;
+        }
+
+        .admin-product-en {
+            font-size: 9px;
+            color: #9c8875;
+            font-family: Arial, sans-serif;
+            direction: ltr;
+            text-align: right;
+        }
+
+        .admin-product-price {
+            color: #b9874b;
+            font-weight: 800;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .small-button {
+            border: none;
+            padding: 8px 10px;
+            border-radius: 9px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .edit-button {
+            background: #eadcca;
+        }
+
+        .delete-button {
+            background: #f3d7d2;
+            color: #8b3022;
+        }
+
+        .toggle-button {
+            background: #dce9dd;
+        }
+
+        .editor-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(20, 10, 4, .7);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .editor-overlay.active {
+            display: flex;
+        }
+
+        .editor {
+            background: #f8f2e9;
+            width: min(600px, 100%);
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 25px;
+            padding: 25px;
+        }
+
+        .editor h2 {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            border: 1px solid #d8c9b8;
+            border-radius: 11px;
+            padding: 12px;
+            outline: none;
+            background: white;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .checks {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .empty {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            color: #8c7865;
+        }
+
+        /* Hide body while checking authentication status to prevent flickering */
+        body {
+            display: none;
+        }
+
+        @media(max-width:650px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-product {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-actions {
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="admin-header">
+    <div class="admin-header-inner">
+        <div>
+            <h1>MōKka Admin</h1>
+            <p>إدارة القائمة والإنذارات</p>
+        </div>
+        <button id="logoutBtn" class="admin-button secondary" style="font-size: 12px; padding: 6px 12px;">تسجيل الخروج</button>
+        <img src="assets/logoIcon.png" alt="MōKka">
+    </div>
+</header>
+
+<main class="admin-container">
+    <section class="stats">
+        <div class="stat">
+            <div class="stat-number" id="totalProducts">0</div>
+            <div class="stat-label">إجمالي المنتجات</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number" id="availableProducts">0</div>
+            <div class="stat-label">المنتجات المتاحة</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number" id="unavailableProducts">0</div>
+            <div class="stat-label">غير متاحة</div>
+        </div>
+    </section>
+
+    <!-- ANNOUNCEMENT BANNER CONTROL -->
+    <section class="admin-card">
+        <h2>📢 الشريط الإعلاني / الإشعار</h2>
+        <p>اكتب رسالة لتظهر في أعلى القائمة للزبائن (اترك الخانات فارغة لإخفاء الشريط تماماً).</p>
+
+        <div class="form-group">
+            <label for="announcementAr">الرسالة بالعربي</label>
+            <input type="text" id="announcementAr" placeholder="مثال: خصم 20% عند شراء أي مشروبين اليوم!">
+        </div>
+
+        <div class="form-group">
+            <label for="announcementEn">English Message</label>
+            <input type="text" id="announcementEn" placeholder="Example: Buy 2 cups and get 1 free today!">
+        </div>
+
+        <button id="saveAnnouncementBtn" class="admin-button primary">حفظ الإعلان</button>
+    </section>
+
+    <section class="admin-toolbar">
+        <input type="search" id="adminSearch" class="admin-search" placeholder="ابحث عن منتج...">
+        <button class="admin-button primary" id="addProduct">+ إضافة منتج</button>
+    </section>
+
+    <section class="admin-products" id="adminProducts"></section>
+</main>
+
+<div class="editor-overlay" id="editorOverlay">
+    <div class="editor">
+        <h2 id="editorTitle">إضافة منتج</h2>
+
+        <div class="form-group">
+            <label>اسم المنتج بالعربي</label>
+            <input id="productName" type="text">
+        </div>
+
+        <div class="form-group">
+            <label>English Name</label>
+            <input id="productEnglish" type="text">
+        </div>
+
+<div class="form-group">
+    <label>صورة المنتج (Product Image)</label>
+    <input id="productFileInput" type="file" accept="image/*">
+    <input id="productImage" type="hidden">
+    
+    <!-- Optional: Image Preview Box -->
+    <div id="imagePreviewContainer" style="margin-top: 10px; display: none;">
+        <img id="imagePreview" src="" alt="Preview" style="max-height: 100px; border-radius: 8px; object-fit: cover;">
+    </div>
+</div>
+
+        <div class="form-group">
+            <label>السعر</label>
+            <input id="productPrice" type="number" min="0">
+        </div>
+
+        <div class="form-group">
+            <label>التصنيف</label>
+            <select id="productCategory">
+                <option value="hot">المشروبات الساخنة</option>
+                <option value="espresso">إسبريسو</option>
+                <option value="cold">مشروبات ساقعة</option>
+                <option value="juice">العصائر</option>
+                <option value="smoothie">سموزي</option>
+                <option value="mocktail">موكتيلز</option>
+                <option value="milkshake">ميلك شيك</option>
+                <option value="soft">سوفت</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>وصف المنتج</label>
+            <textarea id="productDescription" placeholder="اكتب وصف المنتج..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>المكونات — افصل بينها بفاصلة</label>
+            <input id="productIngredients" type="text" placeholder="Espresso, Milk, Foam">
+        </div>
+
+        <div class="checks">
+            <label><input type="checkbox" id="productAvailable" checked> متاح</label>
+            <label><input type="checkbox" id="productFeatured"> اختيار موكا</label>
+            <label><input type="checkbox" id="productNew"> جديد</label>
+        </div>
+
+        <div class="editor-actions">
+            <button class="admin-button primary" id="saveProduct">حفظ</button>
+            <button class="admin-button secondary" id="cancelEditor">إلغاء</button>
+        </div>
+    </div>
+</div>
+
+<script src="data.js"></script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  // Listen for when a file is selected in the file picker
+document.getElementById('productFileInput').addEventListener('change', function(e) {
+  // 1. Get the selected file
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // 2. Check file size (keep it under 1.5 MB so Firestore stays fast)
+  if (file.size > 1.5 * 1024 * 1024) {
+    alert("حجم الصورة كبير جداً. يرجى اختيار صورة أقل من 1.5 ميجابايت.");
+    this.value = ''; // Reset the input
+    return;
+  }
+
+  // 3. Create a FileReader to convert the image to a data string
+  const reader = new FileReader();
+
+  reader.onload = function(event) {
+    const base64String = event.target.result;
+
+    // Save the converted image string inside the hidden input field
+    document.getElementById('productImage').value = base64String;
+
+    // Show the preview picture in the editor modal
+    const preview = document.getElementById('imagePreview');
+    preview.src = base64String;
+    document.getElementById('imagePreviewContainer').style.display = 'block';
+  };
+
+  // 4. Start reading the file
+  reader.readAsDataURL(file);
+});
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD2AcKtUomqBtBVhwXeJGbQHL_X5gizKlM",
+    authDomain: "mokka-menu.firebaseapp.com",
+    projectId: "mokka-menu",
+    storageBucket: "mokka-menu.firebasestorage.app",
+    messagingSenderId: "963891759088",
+    appId: "1:963891759088:web:b1b376f8a6ba656a90bf35",
+    measurementId: "G-69VEHN45TL"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let currentMenu = [];
+  let editingIndex = null;
+  const menuDocRef = doc(db, "restaurant", "menu");
+
+  // Strict Firebase Auth Guard
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = 'login.html';
+    } else {
+      document.body.style.display = 'block';
+      await loadMenuFromFirestore();
+    }
+  });
+
+  // Logout Handler
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    signOut(auth).then(() => {
+      window.location.href = 'login.html';
+    });
+  });
+
+  async function loadMenuFromFirestore() {
+    try {
+      const docSnap = await getDoc(menuDocRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        currentMenu = data.items || [];
+
+        // Populate Announcement inputs if present
+        if (data.announcement) {
+          if (typeof data.announcement === 'object') {
+            document.getElementById('announcementAr').value = data.announcement.ar || '';
+            document.getElementById('announcementEn').value = data.announcement.en || '';
+          } else if (typeof data.announcement === 'string') {
+            document.getElementById('announcementAr').value = data.announcement;
+          }
+        }
+      } else {
+        if (typeof INITIAL_MENU !== "undefined" && INITIAL_MENU.length > 0) {
+          currentMenu = INITIAL_MENU;
+          await setDoc(menuDocRef, { items: INITIAL_MENU, announcement: { ar: "", en: "" } });
+        } else {
+          currentMenu = [];
+        }
+      }
+      renderAdminUI();
+    } catch (err) {
+      alert("Error loading menu: " + err.message);
+    }
+  }
+
+  // Announcement Save Handler
+  document.getElementById('saveAnnouncementBtn').addEventListener('click', async () => {
+    const arText = document.getElementById('announcementAr').value.trim();
+    const enText = document.getElementById('announcementEn').value.trim();
+
+    try {
+      await updateDoc(menuDocRef, {
+        announcement: {
+          ar: arText,
+          en: enText
+        }
+      });
+      alert("تم حفظ الإعلان بنجاح وسيظهر فوراً في المنيو!");
+    } catch (err) {
+      alert("خطأ أثناء حفظ الإعلان: " + err.message);
+    }
+  });
+
+  async function saveMenuToFirestore() {
+    try {
+      await updateDoc(menuDocRef, { items: currentMenu });
+      renderAdminUI();
+    } catch (err) {
+      alert("Error saving menu: " + err.message);
+    }
+  }
+
+  function renderAdminUI() {
+    const container = document.getElementById('adminProducts');
+    const searchVal = document.getElementById('adminSearch').value.toLowerCase();
+    
+    document.getElementById('totalProducts').textContent = currentMenu.length;
+    document.getElementById('availableProducts').textContent = currentMenu.filter(i => i.available !== false).length;
+    document.getElementById('unavailableProducts').textContent = currentMenu.filter(i => i.available === false).length;
+
+    container.innerHTML = '';
+    
+    const filtered = currentMenu.filter(item => 
+      (item.name && item.name.toLowerCase().includes(searchVal)) || 
+      (item.english && item.english.toLowerCase().includes(searchVal))
+    );
+
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="empty">لا توجد منتجات</div>';
+      return;
+    }
+
+    filtered.forEach((item, index) => {
+      const card = document.createElement('div');
+      card.className = 'admin-product';
+      card.innerHTML = `
+        <div>
+          <div class="admin-product-name">${item.name}</div>
+          <div class="admin-product-en">${item.english || ''}</div>
+        </div>
+        <div class="admin-product-price">${item.price} EGP</div>
+        <div class="admin-actions">
+          <button class="small-button toggle-button" data-index="${index}">${item.available === false ? 'إظهار' : 'إخفاء'}</button>
+          <button class="small-button edit-button" data-index="${index}">تعديل</button>
+          <button class="small-button delete-button" data-index="${index}">حذف</button>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+
+    container.querySelectorAll('.toggle-button').forEach(btn => {
+      btn.onclick = () => {
+        const idx = btn.dataset.index;
+        currentMenu[idx].available = currentMenu[idx].available === false ? true : false;
+        saveMenuToFirestore();
+      };
+    });
+
+    container.querySelectorAll('.delete-button').forEach(btn => {
+      btn.onclick = () => {
+        if (confirm("هل أنت تأكد من حذف هذا المنتج؟")) {
+          currentMenu.splice(btn.dataset.index, 1);
+          saveMenuToFirestore();
+        }
+      };
+    });
+
+    container.querySelectorAll('.edit-button').forEach(btn => {
+      btn.onclick = () => openEditor(btn.dataset.index);
+    });
+  }
+
+  document.getElementById('adminSearch').oninput = renderAdminUI;
+
+  const overlay = document.getElementById('editorOverlay');
+  
+  function openEditor(index = null) {
+  editingIndex = index;
+
+  // Always clear the file picker selection when opening the editor
+  document.getElementById('productFileInput').value = '';
+
+  if (index !== null) {
+    // --- EDITING AN EXISTING PRODUCT ---
+    const item = currentMenu[index];
+    document.getElementById('editorTitle').textContent = 'تعديل منتج';
+    document.getElementById('productName').value = item.name || '';
+    document.getElementById('productEnglish').value = item.english || '';
+    document.getElementById('productPrice').value = item.price || 0;
+    document.getElementById('productCategory').value = item.category || 'hot';
+    document.getElementById('productDescription').value = item.description || '';
+    document.getElementById('productIngredients').value = Array.isArray(item.ingredients) ? item.ingredients.join(', ') : (item.ingredients || '');
+    document.getElementById('productAvailable').checked = item.available !== false;
+    document.getElementById('productFeatured').checked = !!item.featured;
+    document.getElementById('productNew').checked = !!item.isNew;
+
+    // Load existing image into the hidden field and preview container
+    const existingImage = item.image || '';
+    document.getElementById('productImage').value = existingImage;
+
+    if (existingImage) {
+      document.getElementById('imagePreview').src = existingImage;
+      document.getElementById('imagePreviewContainer').style.display = 'block';
+    } else {
+      document.getElementById('imagePreviewContainer').style.display = 'none';
+    }
+
+  } else {
+    // --- ADDING A NEW PRODUCT ---
+    document.getElementById('editorTitle').textContent = 'إضافة منتج';
+    document.getElementById('productName').value = '';
+    document.getElementById('productEnglish').value = '';
+    document.getElementById('productPrice').value = '';
+    document.getElementById('productCategory').value = 'hot';
+    document.getElementById('productDescription').value = '';
+    document.getElementById('productIngredients').value = '';
+    document.getElementById('productAvailable').checked = true;
+    document.getElementById('productFeatured').checked = false;
+    document.getElementById('productNew').checked = false;
+
+    // Reset image hidden field and hide preview box
+    document.getElementById('productImage').value = '';
+    document.getElementById('imagePreviewContainer').style.display = 'none';
+  }
+
+  overlay.classList.add('active');
+}
+  document.getElementById('addProduct').onclick = () => openEditor(null);
+  document.getElementById('cancelEditor').onclick = () => overlay.classList.remove('active');
+
+  document.getElementById('saveProduct').onclick = async () => {
+    const newItem = {
+      id: editingIndex !== null ? currentMenu[editingIndex].id : `item_${Date.now()}`,
+      name: document.getElementById('productName').value,
+      english: document.getElementById('productEnglish').value,
+      image: document.getElementById('productImage').value.trim(),
+      price: Number(document.getElementById('productPrice').value),
+      category: document.getElementById('productCategory').value,
+      description: document.getElementById('productDescription').value,
+      ingredients: document.getElementById('productIngredients').value.split(',').map(s => s.trim()).filter(Boolean),
+      available: document.getElementById('productAvailable').checked,
+      featured: document.getElementById('productFeatured').checked,
+      isNew: document.getElementById('productNew').checked
+    };
+
+    if (!newItem.name || isNaN(newItem.price)) {
+      alert("الرجاء إدخال اسم المنتج والسعر بشكل صحيح");
+      return;
+    }
+
+    if (editingIndex !== null) {
+      currentMenu[editingIndex] = newItem;
+    } else {
+      currentMenu.push(newItem);
+    }
+
+    overlay.classList.remove('active');
+    await saveMenuToFirestore();
+  };
+</script>
+
+</body>
+</html>
